@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="robots" content="index, follow">
+    <title>Status</title>
+    <link rel="stylesheet" href="assets/css/roboto.css">
+    <link rel="stylesheet" href="assets/css/normalize.min.css">
+    <link rel="stylesheet" href="assets/css/milligram.min.css">
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="icon" href="assets/img/logo.png">
+  </head>
+  <body>
+
+    <main class="wrapper">
+      <section class="container" id="main">
+        <h1 class="title">
+          <img class="img" src="assets/img/logo.png">
+          Systemstatus
+        </h1>
+
+        <div id="panel" class="panel operational">Laster systemstatus...</div>
+
+        <h4>Applikasjoner</h4>
+        <ul id="apps" class="systems"></ul>
+
+        <h4>Tjenester</h4>
+        <ul id="services" class="systems"></ul>
+
+        <h4>Hendelser</h4>
+        <em>Ingen hendelser de siste dagene.</em>
+
+        <!--{% if incidents %}
+          {% for incident in incidents %}
+          <div class="incident">
+            <span class="date">{{ incident.created }}</span>
+
+            {% if incident.closed %}
+              <span class="label operational float-right">resolved</span>
+            {% else %}
+              <span class="label {{ incident.severity }} float-right">{{ incident.severity }}</span>
+            {% endif %}
+            {% for system in incident.systems %}
+              <span class="label system float-right">{{ system }}</span>
+            {% endfor %}
+            <hr/>
+
+            <span class="title">{{ incident.title }}</span>
+            <p>{{ incident.body }}</p>
+            {% for update in incident.updates %}
+              <p><em>Update {{ update.created }}</em><br/>
+              {{ update.body }}
+              </p>
+            {% endfor %}
+          </div>
+          {% endfor %}
+        {% else %}
+        {% endif %}-->
+      </section>
+
+      <footer class="footer">
+        <section class="container">
+          <hr/>
+          <p>Status page hosted by GitHub, generated with <a href="https://github.com/pyupio/statuspage">pyupio/statuspage</a></p>
+        </section>
+      </footer>
+
+    </main>
+
+    <script src="assets/js/jquery.min.js"></script>
+    <script src="assets/js/script.js"></script>
+  </body>
+</html>
