@@ -15,6 +15,12 @@ $(document).ready(function() {
         return tag.name === 'service' ? 'service' : cat;
       }, 'app');
 
+      // check time since last outage
+      if (check.status === 'up' && Date.now() - (check.lasterrortime * 1000) <= 86400000) {
+        check.class = 'degraded performance';
+        check.text = 'ustabil';
+      }
+
       return check;
     });
 
