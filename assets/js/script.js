@@ -66,9 +66,6 @@ $(document).ready(function() {
         return label.name.replace('system:', '')
       });
 
-      console.log(status);
-      console.log(systems);
-
       var html = '<div class="incident">\n';
       html += '<span class="date">' + issue.created_at + '</span>\n';
 
