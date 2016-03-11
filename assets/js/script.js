@@ -36,8 +36,10 @@ $(document).ready(function() {
       return check.status !== 'up' ? 'major outage' : status;
     }, 'operational');
 
-    $panel.attr('class', 'panel ' + status);
-    $panel.html(status === 'operational' ? 'Alle systemer er operative.' : 'Ett eller flere systemer ute av drift');
+    if (!$panel.data('incident')) {
+      $panel.attr('class', 'panel ' + status);
+      $panel.html(status === 'operational' ? 'Alle systemer er operative.' : 'Ett eller flere systemer ute av drift');
+    }
 
     data.checks.forEach(function(item) {
       var $here = $categories[item.category];
@@ -75,6 +77,12 @@ $(document).ready(function() {
       }).map(function(label) {
         return label.name.replace('system:', '')
       });
+
+      if (issue.state == 'open') {
+        $panel.data('incident', 'true');
+        $panel.attr('class', 'panel ' + status);
+        $panel.html(issue.title);
+      }
 
       var html = '<div class="incident">\n';
       html += '<span class="date">' + datetime(issue.created_at) + '</span>\n';
