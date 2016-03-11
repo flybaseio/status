@@ -26,7 +26,7 @@ $(document).ready(function() {
       // check time since last outage
       if (check.status === 'up' && Date.now() - (check.lasterrortime * 1000) <= 86400000) {
         check.class = 'degraded performance';
-        check.text = 'ustabil';
+        check.text = 'degradert ytelse';
       }
 
       return check;
