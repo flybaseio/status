@@ -67,7 +67,7 @@ $(document).ready(function() {
       });
 
       var html = '<div class="incident">\n';
-      html += '<span class="date">' + issue.created_at + '</span>\n';
+      html += '<span class="date">' + datetime(issue.created_at) + '</span>\n';
 
       // status
       if (issue.state == 'closed') {
@@ -88,7 +88,7 @@ $(document).ready(function() {
       html += '<p>' + issue.body + '</p>\n';
 
       if (issue.state == 'closed') {
-        html += '<p><em>Oppdatert ' + issue.closed_at + '<br/>';
+        html += '<p><em>Oppdatert ' + datetime(issue.closed_at) + '<br/>';
         html += 'Systemet er tilbake i normal drift.</p>';
       }
 
@@ -96,5 +96,14 @@ $(document).ready(function() {
 
       $incidents.append(html);
     });
+
+    function datetime(string) {
+      var datetime = string.split('T');
+
+      var date = datetime[0];
+      var time = datetime[1].replace('Z', '');
+
+      return date + ' ' + time;
+    };
   };
 });
