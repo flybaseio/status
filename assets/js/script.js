@@ -2,21 +2,31 @@ $(document).ready(function() {
   $.getJSON('https://status.app.dnt.no/api/v1/checks').done(status);
 
   var $panel = $('#panel');
-  var $apps = $('#apps');
-  var $services = $('#services');
+  var $categories = {
+    app: $('#apps'),
+    service: $('#services'),
+    payment: $('#payments'),
+  };
 
   function status(data) {
     data.checks = data.checks.map(function(check) {
       check.class = check.status === 'up' ? 'operational' : 'major outage';
       check.text = check.status === 'up' ? 'operativ' : 'driftsavbrudd';
       check.category = check.tags.reduce(function(cat, tag) {
-        return tag.name === 'service' ? 'service' : cat;
+        switch (tag.name) {
+          case 'payment':
+            return 'payment';
+          case 'service':
+            return 'service';
+          default:
+            return cat;
+        }
       }, 'app');
 
       // check time since last outage
       if (check.status === 'up' && Date.now() - (check.lasterrortime * 1000) <= 86400000) {
         check.class = 'degraded performance';
-        check.text = 'ustabilt';
+        check.text = 'ustabil';
       }
 
       return check;
@@ -30,7 +40,7 @@ $(document).ready(function() {
     $panel.html(status === 'operational' ? 'Alle systemer er operative.' : 'Ett eller flere systemer ute av drift');
 
     data.checks.forEach(function(item) {
-      var $here = item.category === 'service' ? $services : $apps;
+      var $here = $categories[item.category];
 
       var name = item.name;
       var clas = item.class;
