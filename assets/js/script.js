@@ -81,7 +81,7 @@ $(document).ready(function() {
       if (issue.state == 'open') {
         $panel.data('incident', 'true');
         $panel.attr('class', 'panel ' + status);
-        $panel.html(issue.title);
+        $panel.html('<a href="#incidents">' + issue.title + '</a>');
       }
 
       var html = '<div class="incident">\n';

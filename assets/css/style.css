@@ -81,6 +81,10 @@ img {
     margin-bottom: 20px;
 }
 
+.panel a{
+  color: white;
+}
+
 .panel.operational, .label.operational{
     background-color: #0DE877;
 }
