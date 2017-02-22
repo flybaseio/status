@@ -1,127 +1,128 @@
 $(document).ready(function() {
-  $.getJSON('https://status.app.dnt.no/api/v1/checks').done(status);
+	var config = {
+		uptimerobot: {
+			api_key: "u199994-308d42ecd1534f113467d2e6",
+			search: "flybase",
+			logs: 1
+		},
+		github: {
+			org: 'flybaseio',
+			repo: 'status'
+		}
+	};
+	var status_text = {
+		'operational': 'operational',
+		'investigating': 'investigating',
+		'major outage': 'outage',
+		'degraded performance': 'degraded',
+	};
 
-  var $panel = $('#panel');
-  var $categories = {
-    app: $('#apps'),
-    service: $('#services'),
-    payment: $('#payments'),
-  };
+	$.post('https://api.uptimerobot.com/v2/getMonitors', {
+		"api_key": config.uptimerobot.api_key,
+		"format": "json",
+		"search": config.uptimerobot.search,
+		"logs": config.uptimerobot.logs,
+	}, function(response) {
+		status( response );
+	}, 'json');
 
-  function status(data) {
-    data.checks = data.checks.map(function(check) {
-      check.class = check.status === 'up' ? 'operational' : 'major outage';
-      check.text = check.status === 'up' ? 'operativ' : 'driftsavbrudd';
-      check.category = check.tags.reduce(function(cat, tag) {
-        switch (tag.name) {
-          case 'payment':
-            return 'payment';
-          case 'service':
-            return 'service';
-          default:
-            return cat;
-        }
-      }, 'app');
+	function status(data) {
+		data.monitors = data.monitors.map(function(check) {
+			check.class = check.status === 2 ? 'label-success' : 'label-danger';
+			check.text = check.status === 2 ? 'operational' : 'major outage';
+			if( check.status !== 2 && !check.lasterrortime ){
+				check.lasterrortime = Date.now();
+			}
+			if (check.status === 2 && Date.now() - (check.lasterrortime * 1000) <= 86400000) {
+				check.class = 'label-warning';
+				check.text = 'degraded performance';
+			}
+			return check;
+		});
 
-      // check time since last outage
-      if (check.status === 'up' && Date.now() - (check.lasterrortime * 1000) <= 86400000) {
-        check.class = 'degraded performance';
-        check.text = 'degradert ytelse';
-      }
+		var status = data.monitors.reduce(function(status, check) {
+			return check.status !== 2 ? 'danger' : 'operational';
+		}, 'operational');
 
-      return check;
-    });
+		if (!$('#panel').data('incident')) {
+			$('#panel').attr('class', (status === 'operational' ? 'panel-success' : 'panel-warning') );
+			$('#paneltitle').html(status === 'operational' ? 'All systems are operational.' : 'One or more systems inoperative');
+		}
+		data.monitors.forEach(function(item) {
+			var name = item.friendly_name;
+			var clas = item.class;
+			var text = item.text;
 
-    var status = data.checks.reduce(function(status, check) {
-      return check.status !== 'up' ? 'major outage' : status;
-    }, 'operational');
+			$('#services').append('<div class="list-group-item">'+
+								'<span class="badge '+ clas + '">' + text + '</span>' +
+								'<h4 class="list-group-item-heading">' + name + '</h4>' +
+								'</div>');
+		});
+	};
 
-    if (!$panel.data('incident')) {
-      $panel.attr('class', 'panel ' + status);
-      $panel.html(status === 'operational' ? 'Alle systemer er operative.' : 'Ett eller flere systemer ute av drift');
-    }
+	$.getJSON( 'https://api.github.com/repos/' + config.github.org + '/' + config.github.repo + '/issues?state=all' ).done(message);
 
-    data.checks.forEach(function(item) {
-      var $here = $categories[item.category];
+	function message(issues) {
+		issues.forEach(function(issue) {
+			var status = issue.labels.reduce(function(status, label) {
+				if (/^status:/.test(label.name)) {
+					return label.name.replace('status:', '');
+				} else {
+					return status;
+				}
+			}, 'operational');
 
-      var name = item.name;
-      var clas = item.class;
-      var text = item.text;
+			var systems = issue.labels.filter(function(label) {
+				return /^system:/.test(label.name);
+			}).map(function(label) {
+				return label.name.replace('system:', '')
+			});
 
-      $here.append('<li>' + name + ' <span class="status ' + clas + '">' + text + '</span></li>') });
-  };
+			if (issue.state == 'open') {
+				$('#panel').data('incident', 'true');
+				$('#panel').attr('class', (status === 'operational' ? 'panel-success' : 'panel-warn') );
+				$('#paneltitle').html('<a href="#incidents">' + issue.title + '</a>');
+			}
 
-  $.getJSON('https://api.github.com/repos/Turistforeningen/status/issues?state=all').done(message);
+			var html = '<div class="list-group-item">\n';
+			html += '<span class="date">' + datetime(issue.created_at) + '</span>\n';
 
-  var $incidents = $('#incidents');
+			// status
+			if (issue.state == 'closed') {
+				html += '<span class="badge label-success pull-right">closed</span>';
+			} else {
+				html += '<span class="badge ' + (status === 'operational' ? 'label-success' : 'label-warn') + ' pull-right">';
+				html += status_text[status];
+				html += '</span>\n';
+			}
 
-  function message(issues) {
-    issues.forEach(function(issue) {
-      var status_text = {
-        operational: 'løst',
-        investigating: 'undersøker',
-        'major outage': 'driftsavbrudd',
-        'degraded performance': 'degradert ytelse',
-      };
+			// systems
+			for (var i = 0; i < systems.length; i++) {
+				html += '<span class="badge system pull-right">' + systems[i] + '</span>';
+			}
 
-      var status = issue.labels.reduce(function(status, label) {
-        if (/^status:/.test(label.name)) {
-          return label.name.replace('status:', '');
-        } else {
-          return status;
-        }
-      }, 'operational');
+			html += '<h4 class="list-group-item-heading">' + issue.title + '</h4>\n';
+			html += '<p class="list-group-item-text">';
 
-      var systems = issue.labels.filter(function(label) {
-        return /^system:/.test(label.name);
-      }).map(function(label) {
-        return label.name.replace('system:', '')
-      });
+			html += '<hr>\n';
+			html += '<p>' + issue.body + '</p>\n';
 
-      if (issue.state == 'open') {
-        $panel.data('incident', 'true');
-        $panel.attr('class', 'panel ' + status);
-        $panel.html('<a href="#incidents">' + issue.title + '</a>');
-      }
+			if (issue.state == 'closed') {
+				html += '<p><em>Updated ' + datetime(issue.closed_at) + '<br/>';
+				html += 'The system is back in normal operation.</p>';
+			}
+			html += '</p>';
+			html += '</div>';
+			$('#incidents').append(html);
+		});
 
-      var html = '<div class="incident">\n';
-      html += '<span class="date">' + datetime(issue.created_at) + '</span>\n';
+		function datetime(string) {
+			var datetime = string.split('T');
 
-      // status
-      if (issue.state == 'closed') {
-        html += '<span class="label operational float-right">løst</span>';
-      } else {
-        html += '<span class="label ' + status + ' float-right">';
-          html += status_text[status];
-        html += '</span>\n';
-      }
+			var date = datetime[0];
+			var time = datetime[1].replace('Z', '');
 
-      // systems
-      for (var i = 0; i < systems.length; i++) {
-        html += '<span class="label system float-right">' + systems[i] + '</span>';
-      }
-
-      html += '<hr>\n';
-      html += '<span class="title">' + issue.title + '</span>\n';
-      html += '<p>' + issue.body + '</p>\n';
-
-      if (issue.state == 'closed') {
-        html += '<p><em>Oppdatert ' + datetime(issue.closed_at) + '<br/>';
-        html += 'Systemet er tilbake i normal drift.</p>';
-      }
-
-      html += '</div>';
-
-      $incidents.append(html);
-    });
-
-    function datetime(string) {
-      var datetime = string.split('T');
-
-      var date = datetime[0];
-      var time = datetime[1].replace('Z', '');
-
-      return date + ' ' + time;
-    };
-  };
+			return date + ' ' + time;
+		};
+	};
 });
