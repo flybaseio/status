@@ -79,9 +79,12 @@ $(document).ready(function() {
 			});
 
 			if (issue.state == 'open') {
-				$('#panel').data('incident', 'true');
-				$('#panel').attr('class', (status === 'operational' ? 'panel-success' : 'panel-warn') );
-				$('#paneltitle').html('<a href="#incidents">' + issue.title + '</a>');
+				$('#incidentpanel').data('incident', 'true');
+				$('#incidentpanel').attr('class', (status === 'operational' ? 'panel-success' : 'panel-warn') );
+				$('#incidentpaneltitle').html('<a href="#incidents">' + issue.title + '</a>');
+				$('#incidentpanel').show();
+			}else{
+				$('#incidentpanel').hide();
 			}
 
 			var html = '<div class="list-group-item">\n';
