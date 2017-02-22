@@ -78,18 +78,15 @@ $(document).ready(function() {
 				return label.name.replace('system:', '')
 			});
 
-			if (issue.state == 'open') {
-				$('#incidentpanel').data('incident', 'true');
-				$('#incidentpanel').attr('class', (status === 'operational' ? 'panel-success' : 'panel-warn') );
-				$('#incidentpaneltitle').html('<a href="#incidents">' + issue.title + '</a>');
-				$('#incidentpanel').show();
-			}else{
-				$('#incidentpanel').hide();
+			if (issue.state === 'open') {
+				$('#panel').data('incident', 'true');
+				$('#panel').attr('class', (status === 'operational' ? 'panel-success' : 'panel-warn') );
+				$('#paneltitle').html('<a href="#incidents">' + issue.title + '</a>');
 			}
 
 			var html = '<article class="timeline-entry">\n';
 			html += '<div class="timeline-entry-inner">\n';
-			if (issue.state == 'closed') {
+			if (issue.state === 'closed') {
 				html += '<div class="timeline-icon bg-success"><i class="entypo-feather"></i></div>';
 			} else {
 				html += '<div class="timeline-icon ' + (status === 'operational' ? 'bg-success' : 'bg-warn') + '"><i class="entypo-feather"></i></div>';
@@ -98,7 +95,7 @@ $(document).ready(function() {
 			html += '<span class="date">' + datetime(issue.created_at) + '</span>\n';
 
 			// status
-			if (issue.state == 'closed') {
+			if (issue.state === 'closed') {
 				html += '<span class="badge label-success pull-right">closed</span>';
 			} else {
 				html += '<span class="badge ' + (status === 'operational' ? 'label-success' : 'label-warn') + ' pull-right">';
@@ -115,7 +112,7 @@ $(document).ready(function() {
 			html += '<hr>\n';
 			html += '<p>' + issue.body + '</p>\n';
 
-			if (issue.state == 'closed') {
+			if (issue.state === 'closed') {
 				html += '<p><em>Updated ' + datetime(issue.closed_at) + '<br/>';
 				html += 'The system is back in normal operation.</p>';
 			}
