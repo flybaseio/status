@@ -86,11 +86,13 @@ $(document).ready(function() {
 
 			var html = '<article class="timeline-entry">\n';
 			html += '<div class="timeline-entry-inner">\n';
+
 			if (issue.state === 'closed') {
-				html += '<div class="timeline-icon bg-success"><i class="entypo-feather"></i></div>';
+				html += '<div class="timeline-icon bg-warn"><i class="entypo-feather"></i></div>';
 			} else {
-				html += '<div class="timeline-icon ' + (status === 'operational' ? 'bg-success' : 'bg-warn') + '"><i class="entypo-feather"></i></div>';
+				html += '<div class="timeline-icon bg-success"><i class="entypo-feather"></i></div>';
 			}
+
 			html += '<div class="timeline-label">\n';
 			html += '<span class="date">' + datetime(issue.created_at) + '</span>\n';
 

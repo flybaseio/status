@@ -20,6 +20,8 @@ We've set this up to use labels to identify issues:
 - `outage` to identify an outage.
 - `degraded` to identify an issue causing degraded performance.
 
+On top of that, you can add labels that start with `system:` and they will show what system the issue is related to. For example `system:blog` would show an issue with our blog.
+
 Labeling an issue with any of these tags will reflect on the status page.
 
 ## [MIT Licensed](https://raw.githubusercontent.com/flybaseio/status/gh-pages/LICENSE)
