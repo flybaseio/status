@@ -87,7 +87,14 @@ $(document).ready(function() {
 				$('#incidentpanel').hide();
 			}
 
-			var html = '<div class="list-group-item">\n';
+			var html = '<article class="timeline-entry">\n';
+			html += '<div class="timeline-entry-inner">\n';
+			if (issue.state == 'closed') {
+				html += '<div class="timeline-icon bg-success"><i class="entypo-feather"></i></div>';
+			} else {
+				html += '<div class="timeline-icon ' + (status === 'operational' ? 'bg-success' : 'bg-warn') + '"><i class="entypo-feather"></i></div>';
+			}
+			html += '<div class="timeline-label">\n';
 			html += '<span class="date">' + datetime(issue.created_at) + '</span>\n';
 
 			// status
@@ -104,9 +111,7 @@ $(document).ready(function() {
 				html += '<span class="badge system pull-right">' + systems[i] + '</span>';
 			}
 
-			html += '<h4 class="list-group-item-heading">' + issue.title + '</h4>\n';
-			html += '<p class="list-group-item-text">';
-
+			html += '<h2>' + issue.title + '</h2>\n';
 			html += '<hr>\n';
 			html += '<p>' + issue.body + '</p>\n';
 
@@ -114,8 +119,9 @@ $(document).ready(function() {
 				html += '<p><em>Updated ' + datetime(issue.closed_at) + '<br/>';
 				html += 'The system is back in normal operation.</p>';
 			}
-			html += '</p>';
 			html += '</div>';
+			html += '</div>';
+			html += '</article>';
 			$('#incidents').append(html);
 		});
 
