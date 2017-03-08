@@ -1,8 +1,13 @@
 $(document).ready(function() {
 	var config = {
 		uptimerobot: {
-			api_key: "u199994-308d42ecd1534f113467d2e6",
-			search: "flybase",
+			api_keys: [
+				'm776590650-e291a9a509ce82dc719350d6',
+				'm776590666-a657ffa8828aea401e337879',
+				'm776590648-36bde29bdc0b551f8ea18b88',
+				'm778556460-a25f70740ba97f693ea2ac5d',
+				'm776590646-e51287a02018f0947feda64a'
+			],
 			logs: 1
 		},
 		github: {
@@ -17,14 +22,17 @@ $(document).ready(function() {
 		'degraded performance': 'degraded',
 	};
 
-	$.post('https://api.uptimerobot.com/v2/getMonitors', {
-		"api_key": config.uptimerobot.api_key,
-		"format": "json",
-		"search": config.uptimerobot.search,
-		"logs": config.uptimerobot.logs,
-	}, function(response) {
-		status( response );
-	}, 'json');
+	var monitors = config.uptimerobot.api_keys;
+	for( var i in monitors ){
+		var api_key = monitors[i];
+		$.post('https://api.uptimerobot.com/v2/getMonitors', {
+			"api_key": api_key,
+			"format": "json",
+			"logs": config.uptimerobot.logs,
+		}, function(response) {
+			status( response );
+		}, 'json');
+	}
 
 	function status(data) {
 		data.monitors = data.monitors.map(function(check) {
