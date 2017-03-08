@@ -109,7 +109,7 @@ $(document).ready(function() {
 				html += '<span class="badge label-success pull-right">closed</span>';
 			} else {
 				html += '<span class="badge ' + (status === 'operational' ? 'label-success' : 'label-warn') + ' pull-right">';
-				html += status_text[status];
+				html += "open";
 				html += '</span>\n';
 			}
 
