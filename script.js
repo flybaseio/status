@@ -72,7 +72,7 @@ $(document).ready(function() {
 
 	function message(issues) {
 		issues.forEach(function(issue) {
-			console.log( issue.labels.count() );
+			console.log( issue.labels.length );
 			var status = issue.labels.reduce(function(status, label) {
 				if (/^status:/.test(label.name)) {
 					return label.name.replace('status:', '');
