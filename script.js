@@ -72,7 +72,7 @@ $(document).ready(function() {
 
 	function message(issues) {
 		issues.forEach(function(issue) {
-			console.log( issue.labels.length );
+			if( issue.labels.length == 0 ) continue; // skip non-labelled issues.
 			var status = issue.labels.reduce(function(status, label) {
 				if (/^status:/.test(label.name)) {
 					return label.name.replace('status:', '');
