@@ -72,65 +72,66 @@ $(document).ready(function() {
 
 	function message(issues) {
 		issues.forEach(function(issue) {
-			if( issue.labels.length == 0 ) continue; // skip non-labelled issues.
-			var status = issue.labels.reduce(function(status, label) {
-				if (/^status:/.test(label.name)) {
-					return label.name.replace('status:', '');
-				} else {
-					return status;
+			if( issue.labels.length > 0 ){ // only display labelled issues
+				var status = issue.labels.reduce(function(status, label) {
+					if (/^status:/.test(label.name)) {
+						return label.name.replace('status:', '');
+					} else {
+						return status;
+					}
+				}, 'operational');
+
+				var systems = issue.labels.filter(function(label) {
+					return /^system:/.test(label.name);
+				}).map(function(label) {
+					return label.name.replace('system:', '')
+				});
+
+				if (issue.state === 'open') {
+					$('#panel').data('incident', 'true');
+					$('#panel').attr('class', (status === 'operational' ? 'panel-success' : 'panel-warn') );
+					$('#paneltitle').html('<a href="#incidents">' + issue.title + '</a>');
 				}
-			}, 'operational');
 
-			var systems = issue.labels.filter(function(label) {
-				return /^system:/.test(label.name);
-			}).map(function(label) {
-				return label.name.replace('system:', '')
-			});
+				var html = '<article class="timeline-entry">\n';
+				html += '<div class="timeline-entry-inner">\n';
 
-			if (issue.state === 'open') {
-				$('#panel').data('incident', 'true');
-				$('#panel').attr('class', (status === 'operational' ? 'panel-success' : 'panel-warn') );
-				$('#paneltitle').html('<a href="#incidents">' + issue.title + '</a>');
+				if (issue.state === 'closed') {
+					html += '<div class="timeline-icon bg-success"><i class="entypo-feather"></i></div>';
+				} else {
+					html += '<div class="timeline-icon bg-secondary"><i class="entypo-feather"></i></div>';
+				}
+
+				html += '<div class="timeline-label">\n';
+				html += '<span class="date">' + datetime(issue.created_at) + '</span>\n';
+
+				// status
+				if (issue.state === 'closed') {
+					html += '<span class="badge label-success pull-right">closed</span>';
+				} else {
+					html += '<span class="badge ' + (status === 'operational' ? 'label-success' : 'label-warn') + ' pull-right">';
+					html += "open";
+					html += '</span>\n';
+				}
+
+				// systems
+				for (var i = 0; i < systems.length; i++) {
+					html += '<span class="badge system pull-right">' + systems[i] + '</span>';
+				}
+
+				html += '<h2>' + issue.title + '</h2>\n';
+				html += '<hr>\n';
+				html += '<p>' + issue.body + '</p>\n';
+
+				if (issue.state === 'closed') {
+					html += '<p><em>Updated ' + datetime(issue.closed_at) + '<br/>';
+					html += 'The system is back in normal operation.</p>';
+				}
+				html += '</div>';
+				html += '</div>';
+				html += '</article>';
+				$('#incidents').append(html);
 			}
-
-			var html = '<article class="timeline-entry">\n';
-			html += '<div class="timeline-entry-inner">\n';
-
-			if (issue.state === 'closed') {
-				html += '<div class="timeline-icon bg-success"><i class="entypo-feather"></i></div>';
-			} else {
-				html += '<div class="timeline-icon bg-secondary"><i class="entypo-feather"></i></div>';
-			}
-
-			html += '<div class="timeline-label">\n';
-			html += '<span class="date">' + datetime(issue.created_at) + '</span>\n';
-
-			// status
-			if (issue.state === 'closed') {
-				html += '<span class="badge label-success pull-right">closed</span>';
-			} else {
-				html += '<span class="badge ' + (status === 'operational' ? 'label-success' : 'label-warn') + ' pull-right">';
-				html += "open";
-				html += '</span>\n';
-			}
-
-			// systems
-			for (var i = 0; i < systems.length; i++) {
-				html += '<span class="badge system pull-right">' + systems[i] + '</span>';
-			}
-
-			html += '<h2>' + issue.title + '</h2>\n';
-			html += '<hr>\n';
-			html += '<p>' + issue.body + '</p>\n';
-
-			if (issue.state === 'closed') {
-				html += '<p><em>Updated ' + datetime(issue.closed_at) + '<br/>';
-				html += 'The system is back in normal operation.</p>';
-			}
-			html += '</div>';
-			html += '</div>';
-			html += '</article>';
-			$('#incidents').append(html);
 		});
 
 		function datetime(string) {
