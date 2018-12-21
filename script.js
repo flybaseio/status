@@ -2,11 +2,6 @@ $(document).ready(function() {
 	var config = {
 		uptimerobot: {
 			api_keys: [
-				'm776590650-e291a9a509ce82dc719350d6',
-				'm776590666-a657ffa8828aea401e337879',
-				'm776590648-36bde29bdc0b551f8ea18b88',
-				'm778556460-a25f70740ba97f693ea2ac5d',
-				'm776590646-e51287a02018f0947feda64a'
 			],
 			logs: 1
 		},
